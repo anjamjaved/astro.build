@@ -1526,8 +1526,8 @@ importers:
         specifier: workspace:*
         version: link:../../..
       preact:
-        specifier: ^10.29.8
-        version: 10.29.8(preact-render-to-string@6.7.0)
+        specifier: ^11.0.0
+        version: 11.0.0(preact-render-to-string@6.7.0)
 
   packages/astro/e2e/fixtures/preact-component:
     dependencies:
@@ -3748,13 +3748,13 @@ importers:
         version: link:../../../../integrations/preact
       '@preact/signals':
         specifier: 2.11.2
-        version: 2.11.2(preact@10.29.8)
+        version: 2.11.2(preact@11.0.0)
       astro:
         specifier: workspace:*
         version: link:../../..
       preact:
-        specifier: ^10.29.8
-        version: 10.29.8(preact-render-to-string@6.7.0)
+        specifier: ^11.0.0
+        version: 11.0.0(preact-render-to-string@6.7.0)
 
   packages/astro/test/fixtures/prerender-conflict-dynamic-dynamic:
     dependencies:
