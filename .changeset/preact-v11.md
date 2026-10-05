@@ -2,4 +2,4 @@
 "@astrojs/preact": patch
 ---
 
-Supports preact v11 in the peer dependencies.
+Supports preact v11 in peer dependencies.
