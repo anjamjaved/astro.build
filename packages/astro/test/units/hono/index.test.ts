@@ -3,9 +3,20 @@ import { describe, it } from 'node:test';
 import { Hono } from 'hono';
 import { FetchState } from '../../../dist/core/fetch/fetch-state.js';
 import { setAmbientManifest } from '../../../dist/core/manifest/ambient.js';
-import { astro, cache, getFetchState, i18n, pages } from '../../../dist/core/hono/index.js';
+import {
+	actions,
+	astro,
+	cache,
+	getFetchState,
+	i18n,
+	middleware,
+	pages,
+	redirects,
+	sessions,
+	trailingSlash,
+} from '../../../dist/core/hono/index.js';
 import { createComponent, render } from '../../../dist/runtime/server/index.js';
-import { createPage, createTestApp } from '../mocks.ts';
+import { createPage, createRedirect, createTestApp } from '../mocks.ts';
 
 const page = createComponent((result: any, props: any, slots: any) => {
 	const Astro = result.createAstro(props, slots);
@@ -164,4 +175,57 @@ describe('i18n() Hono middleware', () => {
 		assert.equal(response.status, 404);
 		assert.match(await response.text(), /<h1>Custom 404<\/h1>/);
 	});
+});
+
+describe('full astro/hono handler chain', () => {
+	function createI18nRedirectApp() {
+		const app = createTestApp(
+			[
+				createPage(page, { route: '/', isIndex: true }),
+				createPage(page, { route: '/en' }),
+				createRedirect({ route: '/old', redirect: '/en' }),
+			],
+			{
+				trailingSlash: 'never',
+				i18n: {
+					defaultLocale: 'en',
+					locales: ['en', 'fr'],
+					strategy: 'pathname-prefix-always',
+					fallbackType: 'rewrite',
+					fallback: undefined,
+					domains: {},
+					domainLookupTable: {},
+				},
+			},
+		);
+		setAmbientManifest(app.manifest);
+		return app;
+	}
+
+	function createDocumentedChain() {
+		const hono = new Hono<HonoEnv>();
+		hono.use(trailingSlash());
+		hono.use(sessions());
+		hono.use(redirects());
+		hono.use(cache());
+		hono.use(i18n());
+		hono.use(middleware());
+		hono.use(actions());
+		hono.use(pages());
+		return hono;
+	}
+
+	for (const path of ['/', '/en', '/en/', '/old']) {
+		it(`responds to ${path} the same way as astro()`, async () => {
+			createI18nRedirectApp();
+			const reference = new Hono<HonoEnv>();
+			reference.use(astro());
+			const expected = await reference.fetch(new Request(`http://example.com${path}`));
+
+			const actual = await createDocumentedChain().fetch(new Request(`http://example.com${path}`));
+
+			assert.equal(actual.status, expected.status);
+			assert.equal(actual.headers.get('location'), expected.headers.get('location'));
+		});
+	}
 });

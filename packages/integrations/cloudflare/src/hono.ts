@@ -1,19 +1,33 @@
 /**
  * Cloudflare middleware for use with `astro/hono`.
  *
- * Usage in `src/app.ts`:
+ * Usage in `src/app.ts`. After `cf()`, the handlers are mounted in the same order
+ * that `astro()` runs them:
  *
  * ```ts
  * import { Hono } from 'hono';
- * import { actions, middleware, pages, i18n } from 'astro/hono';
+ * import {
+ *   actions,
+ *   cache,
+ *   i18n,
+ *   middleware,
+ *   pages,
+ *   redirects,
+ *   sessions,
+ *   trailingSlash,
+ * } from 'astro/hono';
  * import { cf } from '@astrojs/cloudflare/hono';
  *
  * const app = new Hono<{ Bindings: Env }>();
  *
  * app.use(cf());
- * app.use(actions());
- * app.use(middleware());
+ * app.use(trailingSlash());
+ * app.use(sessions());
+ * app.use(redirects());
+ * app.use(cache());
  * app.use(i18n());
+ * app.use(middleware());
+ * app.use(actions());
  * app.use(pages());
  *
  * export default app;

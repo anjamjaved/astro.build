@@ -62,10 +62,12 @@ export function middleware(
 }
 
 /**
- * Dispatches the request to the matched route (endpoint, page, redirect,
- * or fallback). Lazily creates the render context if needed. Unmatched
+ * Dispatches the request to the matched route (endpoint, page, or
+ * fallback). Lazily creates the render context if needed. Unmatched
  * routes render the 404 error page; render-time errors are logged and
- * render the 500 error page.
+ * render the 500 error page. Redirect routes return a 404 here, so
+ * `redirects()` must run first. Never calls the next handler, so it
+ * must be the last step in the pipeline.
  */
 export function pages(state: FetchState): Promise<Response> {
 	return handlePagesWithErrorFallback(state);
