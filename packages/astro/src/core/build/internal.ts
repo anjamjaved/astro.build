@@ -111,6 +111,8 @@ export interface BuildInternals {
 
 	manifestFileName?: string;
 	prerenderEntryFileName?: string;
+	/** The prerender chunk exporting the build image service, emitted for Astro's default prerenderer. */
+	prerenderImageServiceFileName?: string;
 	componentMetadata: SSRResult['componentMetadata'];
 	middlewareEntryPoint: URL | undefined;
 	loggerEntryPoint: URL | undefined;
@@ -163,6 +165,8 @@ export interface BuildInternals {
 	 * cache only reuses them while the encryption key is unchanged.
 	 */
 	serverIslandPageComponents?: Set<string>;
+
+	referencedImages: ReadonlySet<string>;
 }
 
 /**
@@ -193,6 +197,7 @@ export function createBuildInternals(): BuildInternals {
 		loggerEntryPoint: undefined,
 		clientChunksAndAssets: new Set(),
 		ssrAssetsPerEnvironment: new Map(),
+		referencedImages: new Set(),
 	};
 }
 
